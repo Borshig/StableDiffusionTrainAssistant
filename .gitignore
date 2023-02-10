@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+
+SD-TrainAssist/SD-TrainAssist/bin/*
+SD-TrainAssist/SD-TrainAssist/obj/*
+*.v2
+*.v1

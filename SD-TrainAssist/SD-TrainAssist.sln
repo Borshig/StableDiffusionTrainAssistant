@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SD-TrainAssist", "SD-TrainAssist\SD-TrainAssist.csproj", "{AFD22377-3E99-4A38-8926-D71C74DFB9A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFD22377-3E99-4A38-8926-D71C74DFB9A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFD22377-3E99-4A38-8926-D71C74DFB9A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFD22377-3E99-4A38-8926-D71C74DFB9A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFD22377-3E99-4A38-8926-D71C74DFB9A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {67C91B54-B635-47D4-8039-95E94260F1DC}
+	EndGlobalSection
+EndGlobal
