@@ -1,4 +1,8 @@
-﻿using System;
+﻿using HandyControl.Controls;
+using HandyControl.Data;
+using HandyControl.Tools;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,19 +17,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SD_TrainAssist
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : HandyControl.Controls.BlurWindow
     {
-        private string workDir = "";
-        private int currentElement = -1;
+        string workDir = "";
+        string txtAlltokensConf = "txtAlltokens.conf";
+        int currentElement = -1;
         List<string> imgFiles = new List<string>();
         List<string> txtFiles = new List<string>();
-        List<string> tokensInMemory = new List<string>();
+        List<string> tokensAllInMemory = new List<string>();
         FileStream currentOpenedFile;
 
         public MainWindow()
@@ -36,7 +42,11 @@ namespace SD_TrainAssist
         
         private void Button_Prev_Click(object sender, RoutedEventArgs e)
         {
+           
             if (currentElement < 0) return;
+
+            SaveTokensIntoTxtFile();
+
             if (currentElement >= 0)
             {
                 int prevElement = currentElement - 1;
@@ -45,30 +55,55 @@ namespace SD_TrainAssist
                 imgView.Source = new BitmapImage(new Uri(imgFiles[prevElement]));
                 currentElement = prevElement;
             }
+                      
+           
+            ProcessCheckboxes();
         }
 
         private void Button_Next_Click(object sender, RoutedEventArgs e)
         {
             
             if (currentElement < 0) return;
+
+            SaveTokensIntoTxtFile();
+
             int nextElement = currentElement + 1;
 
             if (nextElement > imgFiles.Count - 1) nextElement = 0;
 
             imgView.Source = new BitmapImage(new Uri(imgFiles[nextElement]));
-            currentElement = nextElement;
+            currentElement = nextElement;    
+            
+
+            ProcessCheckboxes();
         }
 
         private void Button_ChooseWorkDir_Click(object sender, RoutedEventArgs e)
         {
+            workDir = tbWorkDir.Text;
+            if (!tbWorkDir.ToString().IsUrl())
+            {
+                var dialog = new System.Windows.Forms.FolderBrowserDialog();
+
+                // Show open file dialog box
+                System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+
+                // Process open file dialog box results
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    // Open document
+                    workDir = dialog.SelectedPath;
+                    tbWorkDir.Text = workDir;
+                }
+            }
+
             imgFiles.Clear();
             txtFiles.Clear();
 
 
-            workDir = tbWorkDir.Text;
             if (!(Directory.Exists(workDir)))
             {
-                MessageBox.Show("Not correct workdir");
+                HandyControl.Controls.MessageBox.Show("Not correct workdir");
                 return;
             }
 
@@ -77,7 +112,7 @@ namespace SD_TrainAssist
 
             if(files.Length == 0)
             {
-                MessageBox.Show("Choosen directory is empty");
+                HandyControl.Controls.MessageBox.Show("Choosen directory is empty");
                 return;
             }
 
@@ -98,26 +133,52 @@ namespace SD_TrainAssist
             }
             if (imgFiles.Count == 0)
             {
-                MessageBox.Show("There is no images");
+                HandyControl.Controls.MessageBox.Show("There is no images");
                 return;
             }
-
-            imgView.Source = new BitmapImage(new Uri(imgFiles[0]));
             currentElement = 0;
+            imgView.Source = new BitmapImage(new Uri(imgFiles[currentElement]));
+            
 
 
             PreProccessFiles();
+            if (File.Exists(workDir + "\\" + txtAlltokensConf))
+            {
+                string tokensStringLine = File.ReadAllText(workDir + "\\" + txtAlltokensConf);
 
+                string[] alltokens = tokensStringLine.Split(",");
+
+                foreach (string token in alltokens)
+                {
+                    if(searchTokensInMemory(token) == 0) AddTokenInMemory(token);
+                }
+               
+            }
+            else
+            {
+                File.Create(workDir + "\\" + txtAlltokensConf).Dispose();
+            }
+
+
+            UpdateTokensCheckBoxes();
+            ProcessCheckboxes();
         }
 
         private void Button_AddToken_Click(object sender, RoutedEventArgs e)
         {
+            if(tbTokens.Text == "" || tbTokens.Text == " " || tbTokens.Text == "\t")
+            {               
+                tbTokens.Clear();
+                return;
+            }
+
             string token = tbTokens.Text;
             if (searchTokensInMemory(token) == 0)
             {
-                tokensInMemory.Add(token);
+                AddTokenInMemory(token);
             }
             UpdateTokensCheckBoxes();
+            ProcessCheckboxes();
             tbTokens.Clear();
         }
 
@@ -125,21 +186,21 @@ namespace SD_TrainAssist
         {
             GridCheckboxes.Children.Clear();
 
-            for (int i = 0; i < tokensInMemory.Count; i++)
+            for (int i = 0; i < tokensAllInMemory.Count; i++)
             {
                 CheckBox newCheckBox = new CheckBox();
-                newCheckBox.Content = tokensInMemory[i];
+                newCheckBox.Content = tokensAllInMemory[i];
                 newCheckBox.Name = "Button" + i;
                 newCheckBox.Height = 28;
-                newCheckBox.Width = 120;
+                newCheckBox.Width = 160;
                 newCheckBox.FontSize = 20;
                 newCheckBox.VerticalContentAlignment = VerticalAlignment.Center;
                 newCheckBox.HorizontalAlignment = HorizontalAlignment.Left;
                 newCheckBox.VerticalAlignment = VerticalAlignment.Top;
 
                 double y = newCheckBox.Height * i;
-                int j = (int)(y / GridCheckboxes.ActualWidth);
-                y = (double)(y % GridCheckboxes.ActualHeight);
+                int j = (int)(y / (GridCheckboxes.ActualHeight - 24));
+                y = (double)(y % (GridCheckboxes.ActualHeight - 24));
 
                 newCheckBox.Margin = new Thickness(newCheckBox.Width*j, y, 0.0, 0.0);
 
@@ -152,6 +213,7 @@ namespace SD_TrainAssist
             }
 
             CheckBox chb = new CheckBox();
+
 
 
            
@@ -265,7 +327,7 @@ namespace SD_TrainAssist
 
                 if(txtFiles.Count != imgFiles.Count)
                 {
-                    MessageBox.Show("Maybe extra .txt without image-pair");
+                    HandyControl.Controls.MessageBox.Show("Maybe extra .txt without image-pair");
                 }
 
 
@@ -280,17 +342,113 @@ namespace SD_TrainAssist
         private int searchTokensInMemory(string token)
         {
             int sum = 0;
-            for (int i = 0; i < tokensInMemory.Count; i++)
+            for (int i = 0; i < tokensAllInMemory.Count; i++)
             {
-                if (tokensInMemory[i] == token) sum++;
+                if (tokensAllInMemory[i] == token) sum++;
             }
                  
 
             return sum;
         }
 
-        // return count of this token. should be 0 or 1; 
-        
+
+        private void SaveTokensIntoTxtFile()
+        {
+            List<string> tokens = new List<string>();
+            for (int i = 0; i < GridCheckboxes.Children.Count; i++)
+            {
+                CheckBox chBox = (CheckBox)GridCheckboxes.Children[i];
+                if(chBox.IsChecked.Value) tokens.Add(chBox.Content.ToString());
+            }
+
+
+            string fileOutput = "";
+            for (int i = 0; i < tokens.Count; i++)
+            {   
+                fileOutput += tokens[i].ToString() + ",";
+            }
+
+            File.WriteAllText(txtFiles[currentElement], fileOutput);
+            //////////////////////////////saved txt files//////////////////////////////////
+
+
+            string tokensStringLine = "";
+            foreach (string token in tokensAllInMemory)
+            {
+                tokensStringLine += token + ",";
+            }
+            if(tokensStringLine.EndsWith(","))
+            {
+                int index = tokensStringLine.LastIndexOf(",");
+                tokensStringLine.Remove(index);
+            }
+
+            File.WriteAllText(workDir + "\\" + txtAlltokensConf, tokensStringLine);
+            //////////////////////////////saved conf files//////////////////////////////////
+
+        }
+
+        List<string> readTokensFromFile(string path)
+        {
+            List<string> result = new List<string>();
+
+            string sReadedSting = File.ReadAllText(path);
+
+            string[] splitedString = sReadedSting.Split(",");
+
+            foreach(string s in splitedString)
+            {
+                if(s != "" && s != " ")
+                {
+                    result.Add(s);
+                }                      
+            }
+            return result;
+        }
+
+        private void ProcessCheckboxes()
+        {
+
+            List<string> tokensForImage = readTokensFromFile(txtFiles[currentElement]);
+
+            if (tokensForImage.Count == 0)
+            {
+                //// Uncheck all if file was empty
+                foreach (CheckBox children in GridCheckboxes.Children)
+                {
+                    children.IsChecked = false;
+                }
+            }
+            else
+            {
+                foreach (CheckBox children in GridCheckboxes.Children)
+                {
+                    children.IsChecked = false;
+                }
+
+                foreach (CheckBox children in GridCheckboxes.Children)
+                {
+                    foreach (string token in tokensForImage)
+                    {
+                        if (token == children.Content.ToString())
+                        {
+                            children.IsChecked = true;
+                        }
+                    }
+                }
+            }
+
+          
+
+        }
+
+        private void AddTokenInMemory(string token)
+        {
+            if (token != "" && token != " " && token != "\t")
+            {
+                tokensAllInMemory.Add(token);
+            }
+        }
 
 
     }
