@@ -17,8 +17,9 @@
         <Button Content="Next" HorizontalAlignment="Left" Margin="620,0,0,-46" VerticalAlignment="Bottom" Height="42" Width="128" TextBlock.FontSize="28" Click="Button_Next_Click"/>
         <TextBox x:Name="tbTokens" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="573" TextBlock.FontSize="28" Height="69"/>
         <Button Grid.Column="1" Content="Add token" HorizontalAlignment="Left" Margin="440,71,0,0" VerticalAlignment="Top" TextBlock.FontSize="28" Click="Button_AddToken_Click"/>
-        <Grid x:Name="GridCheckboxes" Grid.Column="1" Margin="0,112,0,319"/>
-        <Button Grid.Column="1" Content="Set for all" HorizontalAlignment="Left" Margin="442,0,0,275" VerticalAlignment="Bottom" Width="129" TextBlock.FontSize="28" Height="42" Click="Button_SetForAll_Click"/>
+        <Grid x:Name="GridCheckboxes" Grid.Column="1" Margin="1,112,0,52">            
+        </Grid>
+        <Button Grid.Column="1" Content="Set for all" HorizontalAlignment="Left" Margin="437,0,0,10" VerticalAlignment="Bottom" Width="129" TextBlock.FontSize="28" Height="42" Click="Button_SetForAll_Click"/>
         <Button Content="Choose" HorizontalAlignment="Left" Margin="863,18,0,0" VerticalAlignment="Top" Height="42" Width="129" TextBlock.FontSize="28" Click="Button_ChooseWorkDir_Click"/>
 
     </Grid>

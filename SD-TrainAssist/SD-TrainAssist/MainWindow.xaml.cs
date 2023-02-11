@@ -117,23 +117,44 @@ namespace SD_TrainAssist
             {
                 tokensInMemory.Add(token);
             }
-                        
+            UpdateTokensCheckBoxes();
             tbTokens.Clear();
         }
 
         private void UpdateTokensCheckBoxes()
         {
-            for(int i = 0; i < tokensInMemory.Count; i++)
+            GridCheckboxes.Children.Clear();
+
+            for (int i = 0; i < tokensInMemory.Count; i++)
             {
+                CheckBox newCheckBox = new CheckBox();
+                newCheckBox.Content = tokensInMemory[i];
+                newCheckBox.Name = "Button" + i;
+                newCheckBox.Height = 28;
+                newCheckBox.Width = 120;
+                newCheckBox.FontSize = 20;
+                newCheckBox.VerticalContentAlignment = VerticalAlignment.Center;
+                newCheckBox.HorizontalAlignment = HorizontalAlignment.Left;
+                newCheckBox.VerticalAlignment = VerticalAlignment.Top;
+
+                double y = newCheckBox.Height * i;
+                int j = (int)(y / GridCheckboxes.ActualWidth);
+                y = (double)(y % GridCheckboxes.ActualHeight);
+
+                newCheckBox.Margin = new Thickness(newCheckBox.Width*j, y, 0.0, 0.0);
+
+
+                //newBtn.Margin.Left = 0.0;
+                //newBtn.Margin.Top = (double)i*15;
+
+                GridCheckboxes.Children.Add(newCheckBox);
 
             }
+
             CheckBox chb = new CheckBox();
 
 
-            newBtn.Content = i.ToString();
-            newBtn.Name = "Button" + i.ToString();
-
-            sp.Children.Add(newBtn);
+           
 
         }
 
